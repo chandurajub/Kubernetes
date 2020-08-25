@@ -1,0 +1,54 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nginx
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: chandralekhas/d46-nginx:v2
+          imagePullPolicy: Always
+          env:
+            - name: CATALOGUE
+              value: catalogue.catalogue.svc.cluster.local
+            - name: CART
+              value: cart.cart.svc.cluster.local
+            - name: SHIPPING
+              value: shipping.shipping.svc.cluster.local
+            - name: PAYMENT
+              value: payment.payment.svc.cluster.local
+            - name: RATINGS
+              value: ratings.ratings.svc.cluster.local
+            - name: USER
+              value: user.user.svc.cluster.local
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
